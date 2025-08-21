@@ -18,6 +18,9 @@ class FirebaseProvider implements NyProvider {
 
   @override
   afterBoot(Nylo nylo) async {
+    // Skip Firebase entirely if disabled via env flag (no-Firebase build)
+    if (getEnv('DISABLE_FIREBASE', defaultValue: false) == true) return;
+
     // Initialize Firebase (always)
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 

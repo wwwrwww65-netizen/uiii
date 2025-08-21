@@ -41,6 +41,13 @@ class _AiChatPageState extends NyPage<AiChatPage> {
       _controller.clear();
     });
 
+    // Offline/demo mode
+    if (getEnv('DISABLE_FIREBASE', defaultValue: false) == true) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      setState(() => _messages.add(_ChatMessage(role: 'assistant', content: 'رد تجريبي (أوفلاين): $content')));
+      return;
+    }
+
     final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('apiAiChat');
     try {
       final result = await callable.call(<String, dynamic>{
