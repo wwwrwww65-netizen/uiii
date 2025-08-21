@@ -7,15 +7,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:path/path.dart' as p;
 
-class AiChatPage extends StatefulWidget {
-  static const String path = "/ai-chat";
-  const AiChatPage({super.key});
-
-  @override
-  State<AiChatPage> createState() => _AiChatPageState();
+class AiChatPage extends NyStatefulWidget {
+  static RouteView path = ("/ai-chat", (_) => AiChatPage());
+  AiChatPage({super.key}) : super(child: () => _AiChatPageState());
 }
 
-class _AiChatPageState extends State<AiChatPage> {
+class _AiChatPageState extends NyPage<AiChatPage> {
   final List<_ChatMessage> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final ImagePicker _picker = ImagePicker();
@@ -63,7 +60,7 @@ class _AiChatPageState extends State<AiChatPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget view(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('AI Chat'.tr()),

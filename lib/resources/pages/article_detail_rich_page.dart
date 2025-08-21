@@ -6,16 +6,12 @@ import 'package:nylo_framework/nylo_framework.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-class ArticleDetailRichPage extends StatefulWidget {
-  static const String path = "/article-rich";
-
-  const ArticleDetailRichPage({super.key});
-
-  @override
-  State<ArticleDetailRichPage> createState() => _ArticleDetailRichPageState();
+class ArticleDetailRichPage extends NyStatefulWidget {
+  static RouteView path = ("/article-rich", (_) => ArticleDetailRichPage());
+  ArticleDetailRichPage({super.key}) : super(child: () => _ArticleDetailRichPageState());
 }
 
-class _ArticleDetailRichPageState extends State<ArticleDetailRichPage> {
+class _ArticleDetailRichPageState extends NyPage<ArticleDetailRichPage> {
   late final String articleId;
   bool bookmarked = false;
   bool solved = false;
@@ -23,9 +19,9 @@ class _ArticleDetailRichPageState extends State<ArticleDetailRichPage> {
   String? html;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+  void init() {
+    super.init();
+    final args = NyArgument.data();
     articleId = (args?['id'] ?? 'demo-article') as String;
     html = args?['html'] as String?;
   }
@@ -39,7 +35,7 @@ class _ArticleDetailRichPageState extends State<ArticleDetailRichPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget view(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Article".tr()),

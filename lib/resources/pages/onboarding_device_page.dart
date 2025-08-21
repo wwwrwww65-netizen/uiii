@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-class OnboardingDevicePage extends StatefulWidget {
-  static const String path = "/onboarding-device";
-
-  const OnboardingDevicePage({super.key});
-
-  @override
-  State<OnboardingDevicePage> createState() => _OnboardingDevicePageState();
+class OnboardingDevicePage extends NyStatefulWidget {
+  static RouteView path = ("/onboarding-device", (_) => OnboardingDevicePage());
+  OnboardingDevicePage({super.key}) : super(child: () => _OnboardingDevicePageState());
 }
 
-class _OnboardingDevicePageState extends State<OnboardingDevicePage> {
+class _OnboardingDevicePageState extends NyPage<OnboardingDevicePage> {
   String? _selectedModel;
 
   final List<String> _models = const [
@@ -20,7 +16,7 @@ class _OnboardingDevicePageState extends State<OnboardingDevicePage> {
   ];
 
   @override
-  Widget build(BuildContext context) {
+  Widget view(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Select your device".tr())),
       body: Padding(
@@ -46,9 +42,9 @@ class _OnboardingDevicePageState extends State<OnboardingDevicePage> {
               onPressed: _selectedModel == null
                   ? null
                   : () async {
-                      await NyStorage.write(const StorageKey(key: 'FIRST_RUN_DEVICE_MODEL'), _selectedModel);
+                      await NyStorage.store('FIRST_RUN_DEVICE_MODEL', _selectedModel);
                       if (!mounted) return;
-                      NyNavigator.instance.router.navigateTo(context, "/");
+                      routeTo("/");
                     },
               child: Text("Continue".tr()),
             )
@@ -58,4 +54,3 @@ class _OnboardingDevicePageState extends State<OnboardingDevicePage> {
     );
   }
 }
-
