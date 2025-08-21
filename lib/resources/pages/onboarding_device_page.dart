@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingDevicePage extends NyStatefulWidget {
   static RouteView path = ("/onboarding-device", (_) => OnboardingDevicePage());
@@ -42,7 +43,8 @@ class _OnboardingDevicePageState extends NyPage<OnboardingDevicePage> {
               onPressed: _selectedModel == null
                   ? null
                   : () async {
-                      await NyStorage.store('FIRST_RUN_DEVICE_MODEL', _selectedModel);
+                      final sp = await SharedPreferences.getInstance();
+                      await sp.setString('FIRST_RUN_DEVICE_MODEL', _selectedModel!);
                       if (!mounted) return;
                       routeTo("/");
                     },

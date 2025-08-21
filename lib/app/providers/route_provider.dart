@@ -1,6 +1,7 @@
 import '/bootstrap/app_helper.dart';
 import '/routes/router.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RouteProvider implements NyProvider {
   @override
@@ -16,7 +17,8 @@ class RouteProvider implements NyProvider {
       nylo.initRoutes(initialRoute: '/no-connection');
       return;
     }
-    final String? model = await NyStorage.readString('FIRST_RUN_DEVICE_MODEL');
+    final sp = await SharedPreferences.getInstance();
+    final String? model = sp.getString('FIRST_RUN_DEVICE_MODEL');
     if (model == null) {
       nylo.initRoutes(initialRoute: '/onboarding-device');
       return;

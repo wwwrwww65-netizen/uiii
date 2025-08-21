@@ -12,30 +12,18 @@ class ArticleDetailRichPage extends NyStatefulWidget {
 }
 
 class _ArticleDetailRichPageState extends NyPage<ArticleDetailRichPage> {
-  late final String articleId;
+  late String articleId;
   bool bookmarked = false;
   bool solved = false;
   bool offlineSaved = false;
   String? html;
 
   @override
-  void init() {
-    super.init();
-    final args = NyArgument.data();
+  Widget view(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     articleId = (args?['id'] ?? 'demo-article') as String;
     html = args?['html'] as String?;
-  }
 
-  Future<void> _saveOffline() async {
-    final Directory dir = await getApplicationDocumentsDirectory();
-    final File file = File(p.join(dir.path, 'articles', '$articleId.html'));
-    await file.create(recursive: true);
-    await file.writeAsString(html ?? '<p></p>');
-    setState(() => offlineSaved = true);
-  }
-
-  @override
-  Widget view(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Article".tr()),
@@ -86,6 +74,14 @@ class _ArticleDetailRichPageState extends NyPage<ArticleDetailRichPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _saveOffline() async {
+    final Directory dir = await getApplicationDocumentsDirectory();
+    final File file = File(p.join(dir.path, 'articles', '$articleId.html'));
+    await file.create(recursive: true);
+    await file.writeAsString(html ?? '<p></p>');
+    setState(() => offlineSaved = true);
   }
 }
 
