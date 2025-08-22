@@ -1,15 +1,16 @@
-name: Build APK (Artifact Only) for uiii
+name: Build APK (Fixed Version) for uiii
 
 on:
   workflow_dispatch:
   push:
-    branches: [ MASTER ]
+    branches: [ MASTER, cursor/analyze-project-features-and-structure-6086 ]
     paths:
       - '**.dart'
       - 'android/**'
       - 'ios/**'
       - 'pubspec.yaml'
       - '.github/workflows/build-apk-uiii.yml'
+      - '.env'
 
 permissions:
   contents: read
@@ -19,22 +20,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          flutter-version: '3.24.5'
+          
       - name: Flutter pub get
         run: flutter pub get
-      - name: Build debug APK
-        run: flutter build apk --debug --android-skip-build-dependency-validation --dart-define=DISABLE_FIREBASE=true
+        
+      - name: Build debug APK (Fixed)
+        run: |
+          flutter build apk --debug \
+            --android-skip-build-dependency-validation \
+            --dart-define=DISABLE_FIREBASE=true \
+            --dart-define=APP_KEY=demo_key_for_testing \
+            --dart-define=FCM_ENABLED=false \
+            --dart-define=APP_DEBUG=true
+            
       - name: Upload APK artifact (debug)
         uses: actions/upload-artifact@v4
         with:
-          name: app-debug-apk
+          name: app-debug-apk-fixed
           path: build/app/outputs/flutter-apk/app-debug.apk
-      - name: Build release APK (unsigned)
-        run: flutter build apk --release --android-skip-build-dependency-validation --dart-define=DISABLE_FIREBASE=true
+          
+      - name: Build release APK (Fixed, unsigned)
+        run: |
+          flutter build apk --release \
+            --android-skip-build-dependency-validation \
+            --dart-define=DISABLE_FIREBASE=true \
+            --dart-define=APP_KEY=demo_key_for_testing \
+            --dart-define=FCM_ENABLED=false
+            
       - name: Upload APK artifact (release)
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
+          name: app-release-apk-fixed
           path: build/app/outputs/flutter-apk/app-release.apk
+          
+      - name: Build Web (Bonus)
+        run: |
+          flutter build web \
+            --dart-define=DISABLE_FIREBASE=true \
+            --dart-define=APP_KEY=demo_key_for_testing \
+            --dart-define=FCM_ENABLED=false
+            
+      - name: Upload Web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-app-fixed
+          path: build/web/
