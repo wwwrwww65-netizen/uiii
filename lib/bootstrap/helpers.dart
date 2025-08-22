@@ -14,7 +14,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_app/bootstrap/status_alert/models/status_alert_media_configuration.dart';
 import 'package:flutter_app/bootstrap/status_alert/status_alert.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:woosignal/money_formatter/money_formatter.dart';
+// import 'package:woosignal/money_formatter/money_formatter.dart';
 import 'package:wp_json_api/models/wp_user.dart';
 import 'package:wp_json_api/wp_json_api.dart';
 import '/app/models/billing_details.dart';
@@ -103,12 +103,34 @@ PaymentType addPayment(
         required String assetImage,
         required Function pay}) =>
     PaymentType(
-      id: id,
-      name: name,
-      desc: description,
-      assetImage: assetImage,
-      pay: pay,
-    );
+        id: id,
+        name: name,
+        desc: description,
+        assetImage: assetImage,
+        pay: pay);
+
+String formatCurrency(dynamic amount, {String? currency}) {
+  try {
+    // Simple currency formatting without external dependencies
+    if (amount == null) return "0.00";
+    
+    double numAmount = 0.0;
+    if (amount is String) {
+      numAmount = double.tryParse(amount) ?? 0.0;
+    } else if (amount is int) {
+      numAmount = amount.toDouble();
+    } else if (amount is double) {
+      numAmount = amount;
+    }
+    
+    return NumberFormat.currency(
+      symbol: currency ?? '\$',
+      decimalDigits: 2,
+    ).format(numAmount);
+  } catch (e) {
+    return amount.toString();
+  }
+}
 
 showStatusAlert(context,
     {required String title,
@@ -130,18 +152,24 @@ String parseHtmlString(String? htmlString) {
 }
 
 String moneyFormatter(double amount) {
-  MoneyFormatter fmf = MoneyFormatter(
-    amount: amount,
-    settings: MoneyFormatterSettings(
-        symbol: AppHelper.instance.appConfig!.currencyMeta!.symbolNative,
-        symbolAndNumberSeparator: ""),
-  );
-  if (appCurrencySymbolPosition == SymbolPositionType.left) {
-    return fmf.output.symbolOnLeft;
-  } else if (appCurrencySymbolPosition == SymbolPositionType.right) {
-    return fmf.output.symbolOnRight;
+  try {
+    String symbol = AppHelper.instance.appConfig?.currencyMeta?.symbolNative ?? '\$';
+    String formatted = NumberFormat.currency(
+      symbol: symbol,
+      decimalDigits: 2,
+    ).format(amount);
+    
+    if (appCurrencySymbolPosition == SymbolPositionType.left) {
+      return formatted;
+    } else if (appCurrencySymbolPosition == SymbolPositionType.right) {
+      // Remove symbol from left and add to right
+      String withoutSymbol = formatted.replaceFirst(symbol, '').trim();
+      return '$withoutSymbol $symbol';
+    }
+    return formatted;
+  } catch (e) {
+    return amount.toStringAsFixed(2);
   }
-  return fmf.output.symbolOnLeft;
 }
 
 String formatDoubleCurrency({required double total}) {
