@@ -56,23 +56,27 @@ class AppProvider implements NyProvider {
       AppHelper.instance.appConfig = wooSignalApp;
 
       if (wooSignalApp.wpLoginEnabled == 1) {
-        if (wooSignalApp.wpLoginBaseUrl == null) {
+        if (wooSignalApp.wpLoginBaseUrl == null ||
+            wooSignalApp.wpLoginBaseUrl!.isEmpty) {
           AppHelper.instance.appConfig?.wpLoginEnabled = 0;
           NyLogger.debug(
               'Set your stores domain on WooSignal. Go to Features > WP Login and add your domain to "Store Base Url"');
         }
 
-        if (wooSignalApp.wpLoginWpApiPath == null) {
+        if (wooSignalApp.wpLoginWpApiPath == null ||
+            wooSignalApp.wpLoginWpApiPath!.isEmpty) {
           AppHelper.instance.appConfig?.wpLoginEnabled = 0;
           NyLogger.debug(
               'Set your stores Wp JSON path on WooSignal. Go to Features > WP Login and add your Wp JSON path to "WP API Path"');
         }
 
-        WPJsonAPI.instance.init(
-            baseUrl: wooSignalApp.wpLoginBaseUrl ?? "",
-            shouldDebug: getEnv('APP_DEBUG'),
-            wpJsonPath: wooSignalApp.wpLoginWpApiPath ?? "",
-            nylo: nylo);
+        if (AppHelper.instance.appConfig?.wpLoginEnabled == 1) {
+          WPJsonAPI.instance.init(
+              baseUrl: wooSignalApp.wpLoginBaseUrl!,
+              shouldDebug: getEnv('APP_DEBUG'),
+              wpJsonPath: wooSignalApp.wpLoginWpApiPath!,
+              nylo: nylo);
+        }
       }
 
       if (getEnv('DEFAULT_LOCALE', defaultValue: null) == null &&

@@ -22,7 +22,16 @@ class FirebaseProvider implements NyProvider {
     if (getEnv('DISABLE_FIREBASE', defaultValue: false) == true) return;
 
     // Initialize Firebase (always)
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    try {
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
+    } on MissingPluginException catch (e) {
+      NyLogger.error(e.message);
+      return;
+    } catch (e) {
+      NyLogger.error(e.toString());
+      return;
+    }
 
     // Initialize Analytics/Crashlytics/Remote Config
     try {
